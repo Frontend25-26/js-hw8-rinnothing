@@ -1,3 +1,4 @@
+const bgBody = document.body;
 const board = document.getElementById("board");
 const fieldSize = 8;
 
@@ -32,28 +33,68 @@ function addPiece(cell, color, row, col) {
     cell.appendChild(piece);
 }
 
+function isWhite(piece) {
+    return piece.classList.contains("white");
+}
+
 function colorToDirection(piece) {
-    if (piece.classList.contains("white")) {
+    if (isWhite(piece)) {
         return -1;
     }
     return 1;
 }
 
-function isCorrectMove(iFrom, jFrom, iTo, jTo, direction) {
+function changeBackgroundColor(whiteStep) {
+    if (whiteStep) {
+        bgBody.classList.remove("black");
+        return;
+    }
+    bgBody.classList.add("black");
+}
+
+function changeSelected(piece, selected) {
+    if (selected) {
+        piece.classList.add("selected");
+        return;
+    }
+    piece.classList.remove("selected");
+}
+
+function getCellAt(i, j) {
+    return board.querySelectorAll(".row")[i].querySelectorAll(".cell")[j];
+}
+
+function isCorrectMove(fromCell, toCell, direction, whiteStep) {
+    if (toCell.querySelector(".piece")) {
+        return false;
+    }
+
+    let iFrom = parseInt(fromCell.dataset.i);
+    let jFrom = parseInt(fromCell.dataset.j);
+    let iTo = parseInt(toCell.dataset.i);
+    let jTo = parseInt(toCell.dataset.j);
+
     if (iTo < 0 || jTo < 0 || iTo >= fieldSize || jTo >= fieldSize) {
         return false;
     }
+
+    if (Math.abs(jFrom - jTo) == 2 && direction * 2 == iTo - iFrom) {
+        let pieceAtTheWay = getCellAt((iTo + iFrom)/2, (jTo + jFrom)/2).querySelector(".piece");
+
+        if (pieceAtTheWay && (pieceAtTheWay.classList.contains("white") ^ whiteStep)) {
+            console.log(`eaten at ${(iTo + iFrom)/2} ${(jTo + jFrom)/2}`)
+            return true;
+        }
+    }
+
     if (Math.abs(jFrom - jTo) != 1) {
         return false;
     }
     return iTo - iFrom == direction;
 }
 
-function movePiece(piece, iTo, jTo) {
+function movePiece(piece, newCell) {
     let cell = piece.closest(".cell");
-
-    let newRow = board.querySelectorAll(".row")[iTo];
-    let newCell = newRow.querySelectorAll(".cell")[jTo];
     let dI = newCell.getBoundingClientRect().y - cell.getBoundingClientRect().y;
     let dJ = newCell.getBoundingClientRect().x - cell.getBoundingClientRect().x;
 
@@ -68,36 +109,44 @@ function movePiece(piece, iTo, jTo) {
 
 function addBoardHandlers() {
     let pieceSelected = false;
-    let i, j;
+    let fromCell;
     let piece;
     let direction;
+    let whiteStep = true;
+
+    function resetSelection() {
+        pieceSelected = false;
+        changeSelected(piece, false);
+    }
 
     board.addEventListener("click", function(evt) {
         if (!pieceSelected) {
             piece = evt.target.closest(".piece");
             if (!piece) {
-                pieceSelected = false;
                 return;
+            }
+            if (whiteStep ^ isWhite(piece)) {
+                return
             }
             direction = colorToDirection(piece);
 
-            let cell = piece.closest(".cell");
-            i = cell.dataset.i;
-            j = cell.dataset.j;
             pieceSelected = true;
+            changeSelected(piece, true);
+
+            fromCell = piece.closest(".cell");
         } else {
             let cell = evt.target.closest(".cell");
             if (!cell) {
-                pieceSelected = false;
+                resetSelection();
                 return;
             }
 
-            let iTo = cell.dataset.i;
-            let jTo = cell.dataset.j;
-            if (isCorrectMove(i, j, iTo, jTo, direction)) {
-                movePiece(piece, iTo, jTo);
+            if (isCorrectMove(fromCell, cell, direction, whiteStep)) {
+                movePiece(piece, cell);
+                whiteStep = !whiteStep;
+                changeBackgroundColor(whiteStep);
             }
-            pieceSelected = false;
+            resetSelection();
         }
     });
 }
