@@ -54,6 +54,8 @@ body {
     position: absolute;
     margin-left: var(--ml, 0);
     margin-bottom: var(--mb, 0);
+
+    transition: transform 300ms ease-in-out;
 }
 
 .piece.white {
