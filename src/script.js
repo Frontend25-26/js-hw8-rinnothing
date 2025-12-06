@@ -89,16 +89,20 @@ function getPieceAtTheMiddle(fromCell, toCell) {
     return getCellAt((iTo + iFrom)/2, (jTo + jFrom)/2).querySelector(".piece");
 }
 
-function isCorrectEating(fromCell, toCell, direction, whiteStep) {
+function isCorrectEating(fromCell, toCell, whiteStep) {
+    if (toCell.querySelector(".piece")) {
+        return false;
+    }
+
     let iFrom = parseInt(fromCell.dataset.i);
     let jFrom = parseInt(fromCell.dataset.j);
     let iTo = parseInt(toCell.dataset.i);
     let jTo = parseInt(toCell.dataset.j);
 
-    if (Math.abs(jFrom - jTo) == 2 && direction * 2 == iTo - iFrom) {
+    if (Math.abs(jFrom - jTo) == 2 && Math.abs(iFrom - iTo)) {
         let pieceAtTheWay = getPieceAtTheMiddle(fromCell, toCell);
 
-        if (pieceAtTheWay && (pieceAtTheWay.classList.contains("white") ^ whiteStep)) {
+        if (pieceAtTheWay && !pieceAtTheWay.classList.contains("dying") && (pieceAtTheWay.classList.contains("white") ^ whiteStep)) {
             return true;
         }
     }
@@ -114,7 +118,7 @@ function isCorrectMove(fromCell, toCell, direction, whiteStep) {
     let iTo = parseInt(toCell.dataset.i);
     let jTo = parseInt(toCell.dataset.j);
 
-    if (isCorrectEating(fromCell, toCell, direction, whiteStep)) {
+    if (isCorrectEating(fromCell, toCell, whiteStep)) {
         return true;
     }
 
@@ -145,23 +149,18 @@ function tryEat(fromCell, toCell) {
 }
 
 function hasSteps(curCell, direction, whiteStep) {
-    let newI = parseInt(curCell.dataset.i) + 2*direction;
-    if (newI < 0 || newI >= fieldSize) {
-        return false;
-    }
-
+    let curI = parseInt(curCell.dataset.i);
     let curJ = parseInt(curCell.dataset.j);
-    let newJ = curJ + 2;
-    if (newJ < fieldSize) {
-        if (isCorrectEating(curCell, getCellAt(newI, newJ), direction, whiteStep)) {
-            return true;
-        }
-    }
-    
-    newJ = curJ - 2;
-    if (newJ >= 0) {
-        if (isCorrectEating(curCell, getCellAt(newI, newJ), direction, whiteStep)) {
-            return true;
+
+    for (let dI = -2; dI <= 2; dI += 4) {
+        for (let dJ = -2; dJ <= 2; dJ += 4) {
+            let newI = curI + dI;
+            let newJ = curJ + dJ;
+            if (newJ >= 0 && newJ < fieldSize && newI >= 0 && newI < fieldSize) {
+                if (isCorrectEating(curCell, getCellAt(newI, newJ), whiteStep)) {
+                    return true;
+                }
+            }
         }
     }
 
