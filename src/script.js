@@ -234,6 +234,7 @@ function addBoardHandlers() {
     let whiteStep = true;
     let blackPieces = startPiecesNumber;
     let whitePieces = startPiecesNumber;
+    let secondStep = false;
 
     function resetSelection() {
         pieceSelected = false;
@@ -288,14 +289,23 @@ function addBoardHandlers() {
                         }
                     }
                     if (hasSteps(cell, direction, whiteStep)) {
+                        secondStep = true;
                         fromCell = cell;
                         return;
+                    } else {
+                        secondStep = false;
                     }
                 }
                 whiteStep = !whiteStep;
                 changeBackgroundColor(whiteStep);
+                resetSelection();
+                return;
             }
             resetSelection();
+            if (secondStep) {
+                whiteStep = !whiteStep;
+                changeBackgroundColor(whiteStep);
+            }
         }
     });
 }
