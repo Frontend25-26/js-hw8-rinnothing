@@ -99,7 +99,7 @@ function isCorrectEating(fromCell, toCell, whiteStep) {
     let iTo = parseInt(toCell.dataset.i);
     let jTo = parseInt(toCell.dataset.j);
 
-    if (Math.abs(jFrom - jTo) == 2 && Math.abs(iFrom - iTo)) {
+    if (Math.abs(jFrom - jTo) == 2 && Math.abs(iFrom - iTo) == 2) {
         let pieceAtTheWay = getPieceAtTheMiddle(fromCell, toCell);
 
         if (pieceAtTheWay && !pieceAtTheWay.classList.contains("dying") && (pieceAtTheWay.classList.contains("white") ^ whiteStep)) {
@@ -129,7 +129,11 @@ function isCorrectMove(fromCell, toCell, direction, whiteStep) {
 }
 
 function tryEat(fromCell, toCell) {
-    if (Math.abs(fromCell.dataset.i - toCell.dataset.i) != 2 && Math.abs(fromCell.dataset.j - toCell.dataset.j) != 2) {
+    let iFrom = parseInt(fromCell.dataset.i);
+    let jFrom = parseInt(fromCell.dataset.j);
+    let iTo = parseInt(toCell.dataset.i);
+    let jTo = parseInt(toCell.dataset.j);
+    if (Math.abs(iFrom - iTo) != 2 && Math.abs(jFrom - jTo) != 2) {
         return false;
     }
 
@@ -178,7 +182,7 @@ function movePiece(piece, newCell) {
         piece.style.transform = "translate(0px, 0px)";
         cell.removeChild(piece);
         newCell.appendChild(piece);
-    }, "300");
+    }, 300);
 }
 
 function createNotification() {
