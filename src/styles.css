@@ -9,6 +9,12 @@ body {
     height: 100vh;
     margin: 0;
     background-color: #f0f0f0;
+
+    font-family: "Ubuntu", sans-serif;
+}
+
+body.black {
+    background-color: black;
 }
 
 .board {
@@ -54,6 +60,8 @@ body {
     position: absolute;
     margin-left: var(--ml, 0);
     margin-bottom: var(--mb, 0);
+
+    transition: transform 300ms ease-in-out;
 }
 
 .piece.white {
@@ -63,4 +71,72 @@ body {
     background: #272727;
 }
 
+.piece.selected {
+    border: 4px solid yellow;
+}
 
+.piece.dying {
+    animation: dying;
+    animation-duration: 500ms;
+    animation-timing-function: ease-in;
+    animation-fill-mode: forwards;
+}
+
+@keyframes dying {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+.notification-body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: #a9a4a451;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification {
+    background-color: #f0f0f0;
+    text-align: center;
+    padding: 10px 5px;
+    border: solid black 2px;
+    border-radius: 4px;
+
+    font-size: 20px;
+}
+
+.notification h2 {
+    margin: 0px 4px;
+    font-size: 40px;
+}
+
+.winner {
+    color: #e77f0f;
+    font-weight: bold;
+}
+
+.repeat-button {
+    margin-top: 8px;
+    background-color: #00ad00;
+    font-weight: bold;
+    font-size: 24px;
+    padding: 8px;
+    border: 2px solid black;
+    border-radius: 4px;
+
+    transition: background-color, transform ease-in-out 50ms;
+}
+
+.repeat-button:active {
+    background-color: #01be01;
+    transform: scale(1.05);
+}
